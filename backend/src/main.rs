@@ -12,10 +12,11 @@ use tower_http::{
     trace::TraceLayer,
 };
 
-use bitcoin_info::BitcoinInfo;
-use std::sync::Arc;
-use tokio::sync::RwLock;
+use bitcoin_info::{update_bitcoin_info, BitcoinInfo};
+use bitcoincore_rpc::{Auth, Client};
 use log::info;
+use std::sync::Arc;
+use tokio::{sync::RwLock, time};
 
 /// A subcommand for run
 #[derive(Parser)]
@@ -65,6 +66,27 @@ async fn run(opts: RunOpts) {
     let config = config::load_config(opts.config_file);
 
     let shared_state = Arc::new(RwLock::new(BitcoinInfo::default()));
+
+    // start background thread update bitcoin info
+    let config_clone = config.clone();
+    let shared_state_clone = shared_state.clone();
+    tokio::spawn(async move {
+        let client = Client::new(
+            config_clone.rpc_url.as_str(),
+            Auth::UserPass(
+                config_clone.rpc_username.clone(),
+                config_clone.rpc_password.clone(),
+            ),
+        )
+        .unwrap();
+        let mut update_interval = time::interval(Duration::from_secs(config.update_interval));
+        loop {
+            update_interval.tick().await;
+            {
+                update_bitcoin_info(&client, shared_state_clone.clone()).await;
+            }
+        }
+    });
 
     let router = Router::new()
         // static

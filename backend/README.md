@@ -18,20 +18,21 @@
 # 用法
 
 ```
-$ RUST_LOG=tower_http=debug ./target/debug/backend run -c example/config.toml
-[2024-09-27T08:32:57Z DEBUG tower_http::trace::make_span] request; method=GET uri=/bitcoin version=HTTP/1.1
-[2024-09-27T08:32:57Z DEBUG tower_http::trace::on_request] started processing request
-[2024-09-27T08:32:57Z DEBUG tower_http::trace::on_response] finished processing request latency=0 ms status=200
-[2024-09-27T08:33:11Z DEBUG tower_http::trace::make_span] request; method=GET uri=/index.html version=HTTP/1.1
-[2024-09-27T08:33:11Z DEBUG tower_http::trace::on_request] started processing request
-[2024-09-27T08:33:11Z DEBUG tower_http::trace::on_response] finished processing request latency=0 ms status=200
+$ RUST_LOG=tower_http=debug,info ./target/debug/backend run -c example/config.toml
+[2024-09-27T12:15:28Z INFO  backend] start server ...
+[2024-09-27T12:16:19Z DEBUG tower_http::trace::make_span] request; method=GET uri=/index.html version=HTTP/1.1
+[2024-09-27T12:16:19Z DEBUG tower_http::trace::on_request] started processing request
+[2024-09-27T12:16:19Z DEBUG tower_http::trace::on_response] finished processing request latency=0 ms status=200
+[2024-09-27T12:16:28Z DEBUG tower_http::trace::make_span] request; method=GET uri=/bitcoin version=HTTP/1.1
+[2024-09-27T12:16:28Z DEBUG tower_http::trace::on_request] started processing request
+[2024-09-27T12:16:28Z DEBUG tower_http::trace::on_response] finished processing request latency=0 ms status=200
 ```
 
 ```
-$ curl localhost:8080/bitcoin
-{"latest_blocks":0,"synchronized":"0%","connections":0,"connections_in":0,"connections_out":0,"difficulty":"0TH/s","disk_usage":"0G","mempool":"0M","hash_rate":"0EH/s"}
+$ curl localhost:8000/bitcoin
+{"latest_blocks":863068,"difficulty":"88.40 TH/s","synchronized":"100.00%","disk_usage":"4.86 GB","prune_mode":"Yes","connections":10,"connections_in":0,"connections_out":10,"mempool":"279.49 MB","hash_rate":"559.01 EH/s"}
 
-$ curl localhost:8080/index.html
+$ curl localhost:8000/index.html
 <!DOCTYPE html>
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
