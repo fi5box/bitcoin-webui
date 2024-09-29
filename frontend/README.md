@@ -63,7 +63,12 @@ We use [Trunk](https://trunkrs.dev/) to build for web target.
 
 后来发现用`request_repaint_after`就可以了。
 
-鼠标一动就刷新的特别快。
+发现新问题：鼠标一动就刷新的特别快。
+
+尝试了官方例子，也有这个现象。
+
+现在问题是，频繁的刷新会触发频繁的`request`。
+
 
 ### 文字无法复制
 
@@ -72,6 +77,10 @@ We use [Trunk](https://trunkrs.dev/) to build for web target.
 可能是用`label`的问题？不知道换其他组件是否可以解决？
 
 但是官方的例子中也是用的`label`，但是它那里就可以复制，不知道为什么？
+
+找到一个[讨论](https://github.com/emilk/egui/discussions/4516)，说是`http`的问题，如果用`https`应该就可以了。
+
+已经验证，生成一个自签证书，`trunk` 增加`--tls-key-path ./private.key --tls-cert-path ./certificate.crt`参数之后，用`https`协议就可以复制了。
 
 ### 布局
 

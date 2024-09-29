@@ -21,3 +21,6 @@ Cargo.lock
 #.idea/
 
 dist/
+
+certificate.crt
+private.key
