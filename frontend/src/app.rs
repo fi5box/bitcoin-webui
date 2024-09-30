@@ -2,7 +2,15 @@ use egui::RichText;
 use serde::{Deserialize, Serialize};
 use serde_json::Result;
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
+use web_time::{Duration, SystemTime};
+
+// secs sin 1970.1.1 0:0:0
+fn unix_now() -> u64 {
+    SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap()
+        .as_secs()
+}
 
 // keep sync with backend project
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -46,6 +54,7 @@ pub struct TemplateApp {
     bitcoin_info: Arc<Mutex<BitcoinInfo>>,
     update_interval: u64,
     //resp_msg: Arc<Mutex<String>>,
+    start_time: u64,
 }
 
 impl Default for TemplateApp {
@@ -56,6 +65,7 @@ impl Default for TemplateApp {
             bitcoin_info: Arc::new(Mutex::new(BitcoinInfo::default())),
             update_interval: 10,
             //resp_msg: Arc::new(Mutex::new("response: ".to_string())),
+            start_time: unix_now(),
         }
     }
 }
@@ -87,26 +97,29 @@ impl eframe::App for TemplateApp {
         // Put your widgets into a `SidePanel`, `TopBottomPanel`, `CentralPanel`, `Window` or `Area`.
         // For inspiration and more examples, go to https://emilk.github.io/egui
 
-        let bitcoin_info_store = self.bitcoin_info.clone();
-        let ctx_clone = ctx.clone();
-        //let resp_msg_clone = self.resp_msg.clone();
-        let update_interval = self.update_interval;
+        if unix_now() - self.start_time > self.update_interval {
+            self.start_time = unix_now();
+            let bitcoin_info_store = self.bitcoin_info.clone();
+            let ctx_clone = ctx.clone();
+            //let resp_msg_clone = self.resp_msg.clone();
+            let update_interval = self.update_interval;
 
-        let request = ehttp::Request::get("/bitcoin");
-        ehttp::fetch(request, move |response| {
-            if let Ok(resp) = response {
-                if let Some(rsp) = resp.text() {
-                    //{
-                    //    *resp_msg_clone.lock().unwrap() = format!("response {:?}", rsp);
-                    //    ctx_clone.request_repaint_after(Duration::from_secs(update_interval));
-                    //}
-                    if let Ok(v) = serde_json::from_str(rsp) as Result<BitcoinInfo> {
-                        *bitcoin_info_store.lock().unwrap() = v;
-                        ctx_clone.request_repaint_after(Duration::from_secs(update_interval));
+            let request = ehttp::Request::get("/bitcoin");
+            ehttp::fetch(request, move |response| {
+                if let Ok(resp) = response {
+                    if let Some(rsp) = resp.text() {
+                        //{
+                        //    *resp_msg_clone.lock().unwrap() = format!("response {:?}", rsp);
+                        //    ctx_clone.request_repaint_after(Duration::from_secs(update_interval));
+                        //}
+                        if let Ok(v) = serde_json::from_str(rsp) as Result<BitcoinInfo> {
+                            *bitcoin_info_store.lock().unwrap() = v;
+                            ctx_clone.request_repaint_after(Duration::from_secs(update_interval));
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
 
         let bitcoin_info = self.bitcoin_info.lock().unwrap().clone();
 
