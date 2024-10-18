@@ -1,0 +1,15 @@
+[build]
+
+[serve.headers]
+# see ./assets/_headers for more documentation
+# "cross-origin-embedder-policy"= "require-corp"
+# "cross-origin-opener-policy"= "same-origin"
+# "cross-origin-resource-policy"= "same-site"
+# "Access-Control-Allow-Origin" = "*"
+
+[[proxy]]
+# This proxy specifies only the backend, which is the only required field. In this example,
+# request URIs are not modified when proxied.
+rewrite = "/bitcoin"
+backend = "http://localhost:8000/bitcoin"
+# request_headers = { "Content-Type" = "text/plain; charset=utf-8", "Accept" = "*/*", "Authorization" = "Basic Yml0Y29pbjpiaXRjb2lu" }

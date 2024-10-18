@@ -1,0 +1,17 @@
+{
+  "name": "Bitcoin WebUI",
+  "short_name": "bitcoin-webui",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "294x294",
+      "type": "image/png"
+    }
+  ],
+  "lang": "en-US",
+  "id": "/index.html",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "white",
+  "theme_color": "white"
+}
